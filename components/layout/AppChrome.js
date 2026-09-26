@@ -9,7 +9,7 @@ import { api } from "@/lib/client";
 import { SummaryContext } from "@/lib/useSummary";
 import { notifyDataChanged, useDataChanged } from "@/lib/useDataChanged";
 
-export default function AppChrome({ initialSummary, children }) {
+export default function AppChrome({ initialSummary, storeKind, children }) {
   const [summary, setSummary] = useState(initialSummary);
   const [showAdd, setShowAdd] = useState(false);
 
@@ -35,6 +35,11 @@ export default function AppChrome({ initialSummary, children }) {
   return (
     <SummaryContext.Provider value={summary}>
       <ToastProvider>
+        {storeKind === "memory" && (
+          <div className="bg-amber-100 px-4 py-1.5 text-center text-[11px] text-amber-800">
+            DB 未接続：サンプルデータで動作中（サーバーを再起動すると消えます）
+          </div>
+        )}
         <PointHeader summary={summary} />
         <div className="pb-28">{children}</div>
         <BottomNav onAddClick={() => setShowAdd(true)} />

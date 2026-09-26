@@ -20,6 +20,18 @@ npm run dev                  # http://localhost:3000
 `DATABASE_URL` を設定しない場合は、サンプルデータ入りのメモリストアで動く（サーバー再起動で消える）。
 DB につながず試したいときは `DATABASE_URL= npm run dev`。
 
+### DB 接続の確認
+
+`/api/health` を開くと、保存先と接続状態がわかる。
+
+- `{"ok":true,"store":"neon","database":"my-rule"}` … Neon に接続できている
+- `"store":"memory"` … `DATABASE_URL` が読み込まれていない（開発時はサンプルデータで動き、本番ではエラーになる）
+- `{"ok":false,"store":"neon","error":...}` … URL はあるが接続に失敗（URL の誤り・DB 名違いなど）
+
+開発時（`npm run dev`）に DB 未接続のときは、画面上部に黄色の「DB 未接続」バーが出る。
+本番ビルドでは `DATABASE_URL` がないとエラーになる（黙ってメモリ保存にならないように）。
+本番ビルドをあえてメモリで動かすときだけ `ALLOW_MEMORY_STORE=1` を付ける。
+
 ### データベース（Neon）
 
 Neon の SQL Editor で対象 DB を選び、`schema.sql` を実行する（何度実行しても安全）。
@@ -31,7 +43,9 @@ Neon の SQL Editor で対象 DB を選び、`schema.sql` を実行する（何�
 3. **Environment Variables** に以下を設定して Deploy
    - `DATABASE_URL`（必須）
    - `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`（任意。両方設定すると Basic 認証がかかる）
-4. **Settings → Functions → Function Region** を Neon と同じ Singapore (`sin1`) にする
+4. デプロイ後に `https://<あなたのURL>/api/health` を開き、`"store":"neon"` と `"ok":true` になっていることを確認する。
+   環境変数を後から追加・変更した場合は **Deployments → 最新の … → Redeploy** しないと反映されない
+5. **Settings → Functions → Function Region** を Neon と同じ Singapore (`sin1`) にする
    （コード側でも `preferredRegion = "sin1"` を指定済み）
 
 現状ログイン機能はないため、URL を知っていれば誰でも操作できる。公開する場合は Basic 認証の設定を推奨。

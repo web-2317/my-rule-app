@@ -3,6 +3,7 @@ import "./globals.css";
 import AppChrome from "@/components/layout/AppChrome";
 import { getSummary } from "@/lib/service";
 import { todayKey } from "@/lib/dates";
+import { getStoreKind } from "@/lib/store";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,7 +36,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="ja">
       <body className={`${inter.className} min-h-screen bg-page`}>
-        <AppChrome initialSummary={summary}>{children}</AppChrome>
+        <AppChrome initialSummary={summary} storeKind={getStoreKind()}>{children}</AppChrome>
       </body>
     </html>
   );
