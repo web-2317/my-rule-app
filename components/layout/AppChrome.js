@@ -1,28 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import AddSheet from "./AddSheet";
 import BottomNav from "./BottomNav";
 import PointHeader from "./PointHeader";
 import { ToastProvider } from "@/components/ui/Toast";
-import { api } from "@/lib/client";
 import { SummaryContext } from "@/lib/useSummary";
-import { notifyDataChanged, useDataChanged } from "@/lib/useDataChanged";
+import { notifyDataChanged } from "@/lib/useDataChanged";
+import { prefetch, useResource } from "@/lib/useResource";
 
-export default function AppChrome({ initialSummary, storeKind, children }) {
-  const [summary, setSummary] = useState(initialSummary);
+// 各タブで使うデータ。起動時にまとめて先読みし、タブ切り替えで待たないようにする
+const PREFETCH_KEYS = ["/api/tasks", "/api/rewards", "/api/stats", "/api/logs"];
+
+export default function AppChrome({ children }) {
+  const { data: summary } = useResource("/api/summary");
   const [showAdd, setShowAdd] = useState(false);
 
-  const loadSummary = useCallback(async () => {
-    try {
-      setSummary(await api("/api/summary"));
-    } catch (e) {
-      console.error(e);
-    }
+  useEffect(() => {
+    prefetch(PREFETCH_KEYS);
   }, []);
-
-  useDataChanged(loadSummary);
 
   // ヘッダーの高さを CSS 変数に反映し、スクロール位置の調整（scroll-padding-top）に使う
   const topRef = useRef(null);
@@ -64,7 +61,7 @@ export default function AppChrome({ initialSummary, storeKind, children }) {
     <SummaryContext.Provider value={summary}>
       <ToastProvider>
         <div ref={topRef} className="sticky top-0 z-30">
-          {storeKind === "memory" && (
+          {summary?.store === "memory" && (
             <div className="bg-amber-100 px-4 py-1.5 text-center text-[11px] text-amber-800">
               DB 未接続：サンプルデータで動作中（サーバーを再起動すると消えます）
             </div>

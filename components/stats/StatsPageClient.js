@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ChartCard from "./ChartCard";
 import HistoryList from "./HistoryList";
 import RankingCard from "./RankingCard";
@@ -8,41 +8,35 @@ import SummaryTiles from "./SummaryTiles";
 import { GAIN_COLOR, LOSS_COLOR } from "./PointsChart";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { iconText } from "@/components/ui/ItemIcon";
+import PageSkeleton, { LoadError } from "@/components/ui/PageSkeleton";
 import PageTitle from "@/components/ui/PageTitle";
 import { useToast } from "@/components/ui/Toast";
 import { api } from "@/lib/client";
-import { useDataChanged } from "@/lib/useDataChanged";
+import { useResource } from "@/lib/useResource";
 import { useUndo } from "@/lib/useUndo";
 
-export default function StatsPageClient({ initialStats, initialHistory }) {
-  const [stats, setStats] = useState(initialStats);
-  const [history, setHistory] = useState(initialHistory);
+export default function StatsPageClient() {
+  const { data: stats, error, reload } = useResource("/api/stats");
+  const { data: firstPage } = useResource("/api/logs");
+  // 「もっと見る」で追加読み込みした分（1ページ目が更新されたらリセット）
+  const [olderPages, setOlderPages] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [undoing, setUndoing] = useState(null);
   const [pending, setPending] = useState(false);
   const toast = useToast();
   const undo = useUndo();
 
-  useEffect(() => setStats(initialStats), [initialStats]);
-  useEffect(() => setHistory(initialHistory), [initialHistory]);
+  useEffect(() => setOlderPages([]), [firstPage]);
 
-  const load = useCallback(async () => {
-    try {
-      const [s, h] = await Promise.all([api("/api/stats"), api("/api/logs")]);
-      setStats(s);
-      setHistory(h);
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
-  useDataChanged(load);
+  const pages = firstPage ? [firstPage, ...olderPages] : [];
+  const historyLogs = pages.flatMap((p) => p.logs);
+  const nextCursor = pages.length ? pages[pages.length - 1].nextCursor : null;
 
   const loadMore = async () => {
     setLoadingMore(true);
     try {
-      const next = await api(`/api/logs?before=${history.nextCursor}`);
-      setHistory((h) => ({ logs: [...h.logs, ...next.logs], nextCursor: next.nextCursor }));
+      const next = await api(`/api/logs?before=${nextCursor}`);
+      setOlderPages((prev) => [...prev, next]);
     } catch (e) {
       toast({ message: e.message, tone: "error" });
     } finally {
@@ -61,16 +55,22 @@ export default function StatsPageClient({ initialStats, initialHistory }) {
     <main className="mx-auto max-w-3xl space-y-4 px-4 pb-8 pt-6 sm:px-6">
       <PageTitle title="データ" subtitle="積み重ねを振り返ろう" />
 
-      <SummaryTiles stats={stats} gainColor={GAIN_COLOR} lossColor={LOSS_COLOR} />
-      <ChartCard daily={stats.daily} />
-      <RankingCard stats={stats} />
-      <HistoryList
-        logs={history.logs}
-        hasMore={Boolean(history.nextCursor)}
+      {!stats || !firstPage ? (
+        error ? <LoadError onRetry={reload} /> : <PageSkeleton count={3} height="h-56" />
+      ) : (
+        <>
+          <SummaryTiles stats={stats} gainColor={GAIN_COLOR} lossColor={LOSS_COLOR} />
+          <ChartCard daily={stats.daily} />
+          <RankingCard stats={stats} />
+          <HistoryList
+            logs={historyLogs}
+            hasMore={Boolean(nextCursor)}
         loadingMore={loadingMore}
-        onLoadMore={loadMore}
-        onUndo={setUndoing}
-      />
+            onLoadMore={loadMore}
+            onUndo={setUndoing}
+          />
+        </>
+      )}
 
       {undoing && (
         <ConfirmDialog

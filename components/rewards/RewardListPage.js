@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import RewardCard from "./RewardCard";
 import RewardForm from "./RewardForm";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -8,36 +8,27 @@ import EmptyState from "@/components/ui/EmptyState";
 import ItemIcon, { iconText } from "@/components/ui/ItemIcon";
 import ListToolbar, { ToolbarButton } from "@/components/ui/ListToolbar";
 import Modal from "@/components/ui/Modal";
+import PageSkeleton, { LoadError } from "@/components/ui/PageSkeleton";
 import PageTitle from "@/components/ui/PageTitle";
 import ReorderList from "@/components/ui/ReorderList";
 import { useToast } from "@/components/ui/Toast";
 import { api } from "@/lib/client";
-import { notifyDataChanged, useDataChanged } from "@/lib/useDataChanged";
+import { notifyDataChanged } from "@/lib/useDataChanged";
+import { useResource } from "@/lib/useResource";
 import { useSummary } from "@/lib/useSummary";
 import { useUndo } from "@/lib/useUndo";
 
-export default function RewardListPage({ initialRewards }) {
-  const [rewards, setRewards] = useState(initialRewards);
+export default function RewardListPage() {
+  const { data: rewards, error, reload } = useResource("/api/rewards");
   const [confirming, setConfirming] = useState(null); // { reward, count }
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [reordering, setReordering] = useState(false);
   const [pending, setPending] = useState(false);
-  const { balance } = useSummary();
+  // 残高が分かるまではカードを出さない（「あと ○pt」を誤って表示しないため）
+  const balance = useSummary()?.balance;
   const toast = useToast();
   const undo = useUndo();
-
-  useEffect(() => setRewards(initialRewards), [initialRewards]);
-
-  const load = useCallback(async () => {
-    try {
-      setRewards(await api("/api/rewards"));
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
-  useDataChanged(load);
 
   const handleRedeem = async () => {
     const { reward, count } = confirming;
@@ -89,7 +80,9 @@ export default function RewardListPage({ initialRewards }) {
     <main className="mx-auto max-w-3xl px-4 pb-8 pt-6 sm:px-6">
       <PageTitle title="ご褒美" subtitle="貯めたポイントで自分にご褒美を" />
 
-      {rewards.length === 0 ? (
+      {!rewards || balance === undefined ? (
+        error ? <LoadError onRetry={reload} /> : <PageSkeleton />
+      ) : rewards.length === 0 ? (
         <EmptyState title="ご褒美はまだありません" hint="下の ＋ から追加できます" />
       ) : reordering ? (
         <ReorderList items={rewards} onSave={handleReorder} onCancel={() => setReordering(false)} />

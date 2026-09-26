@@ -7,13 +7,19 @@ function formatPoints(n) {
 }
 
 // 全ページ共通の上部バー。所持ポイントが変わると一瞬強調する
-export default function PointHeader({ summary, scrolled }) {
+const EMPTY = { balance: null, today: { earned: 0, spent: 0, penalty: 0 } };
+
+// summary が未取得の間は残高を「—」で表示する
+export default function PointHeader({ summary = EMPTY, scrolled }) {
   const { balance, today } = summary;
   const [flash, setFlash] = useState(null);
   const prev = useRef(balance);
 
   useEffect(() => {
-    if (balance === prev.current) return;
+    if (balance === prev.current || balance === null || prev.current === null) {
+      prev.current = balance;
+      return;
+    }
     setFlash(balance > prev.current ? "up" : "down");
     prev.current = balance;
     const t = setTimeout(() => setFlash(null), 700);
@@ -42,7 +48,7 @@ export default function PointHeader({ summary, scrolled }) {
                     : "text-gray-900"
               }`}
             >
-              {formatPoints(balance)}
+              {balance === null ? "—" : formatPoints(balance)}
               <span className="ml-0.5 text-sm font-semibold text-gray-400">pt</span>
             </p>
           </div>

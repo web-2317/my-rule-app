@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -8,34 +8,23 @@ import EmptyState from "@/components/ui/EmptyState";
 import { iconText } from "@/components/ui/ItemIcon";
 import ListToolbar, { ToolbarButton } from "@/components/ui/ListToolbar";
 import Modal from "@/components/ui/Modal";
+import PageSkeleton, { LoadError } from "@/components/ui/PageSkeleton";
 import PageTitle from "@/components/ui/PageTitle";
 import ReorderList from "@/components/ui/ReorderList";
 import { useToast } from "@/components/ui/Toast";
 import { api } from "@/lib/client";
-import { notifyDataChanged, useDataChanged } from "@/lib/useDataChanged";
+import { notifyDataChanged } from "@/lib/useDataChanged";
+import { useResource } from "@/lib/useResource";
 import { useUndo } from "@/lib/useUndo";
 
-export default function TaskListPage({ initialTasks }) {
-  const [tasks, setTasks] = useState(initialTasks);
+export default function TaskListPage() {
+  const { data: tasks, error, reload } = useResource("/api/tasks");
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [reordering, setReordering] = useState(false);
   const [pending, setPending] = useState(false);
   const toast = useToast();
   const undo = useUndo();
-
-  // ページ遷移で戻ってきたときはサーバーから渡された最新データで置き換える
-  useEffect(() => setTasks(initialTasks), [initialTasks]);
-
-  const load = useCallback(async () => {
-    try {
-      setTasks(await api("/api/tasks"));
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
-  useDataChanged(load);
 
   // 成功時は記録（log）を返し、失敗時は null を返す
   const handleComplete = async (task, count) => {
@@ -86,8 +75,8 @@ export default function TaskListPage({ initialTasks }) {
     }
   };
 
-  const normalTasks = tasks.filter((t) => !t.is_penalty);
-  const penaltyTasks = tasks.filter((t) => t.is_penalty);
+  const normalTasks = tasks?.filter((t) => !t.is_penalty) ?? [];
+  const penaltyTasks = tasks?.filter((t) => t.is_penalty) ?? [];
   const renderCard = (t) => (
     <TaskCard
       key={t.id}
@@ -102,7 +91,9 @@ export default function TaskListPage({ initialTasks }) {
     <main className="mx-auto max-w-3xl px-4 pb-8 pt-6 sm:px-6">
       <PageTitle title="タスク" subtitle="達成してポイントを貯めよう" />
 
-      {tasks.length === 0 ? (
+      {!tasks ? (
+        error ? <LoadError onRetry={reload} /> : <PageSkeleton />
+      ) : tasks.length === 0 ? (
         <EmptyState title="タスクはまだありません" hint="下の ＋ から追加できます" />
       ) : reordering ? (
         // 通常タスクが上、ペナルティが下という表示順は保ったまま、それぞれの中で並べ替える
