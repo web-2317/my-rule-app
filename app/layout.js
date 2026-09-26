@@ -25,8 +25,7 @@ export const viewport = {
   themeColor: "#10B981",
 };
 
-// 表示内容が「今日」と DB に依存するため、全ページをリクエストごとに生成する
-// （読み取り結果は lib/service.js 側で日付ごとにキャッシュしている）
+// 表示内容が「今日」と DB に依存するため、全ページをリクエストごとに生成する（キャッシュしない）
 export const dynamic = "force-dynamic";
 // API と同じく、Neon の DB リージョン（Singapore）の近くでページを生成する
 export const preferredRegion = "sin1";

@@ -61,7 +61,7 @@ components/
   tasks/ rewards/ stats/   各画面の部品
   ui/       Modal・Toast・Stepper などの共通部品
 lib/
-  service.js   業務ルール（計算・上限・残高チェック・取り消し）とキャッシュ
+  service.js   業務ルール（計算・上限・残高チェック・取り消し）
   points.js    ポイント計算（サーバーとフォームのプレビューで共用）
   store/       保存先（neon.js / memory.js）。SQL はここだけ
 middleware.js  任意の Basic 認証
@@ -76,4 +76,4 @@ schema.sql
 - ペナルティで残高を超える場合は 0pt で止め、実際に引いた分だけ記録する。
 - 取り消しは、残高がマイナスになる場合はできない。同じ日の同じタスクは新しい記録から順に取り消す（回数計算がずれないように）。
 - タスク・ご褒美の削除はアーカイブ（非表示）で、履歴と統計は残る。
-- 読み取りは `unstable_cache` で日付ごとにキャッシュし、書き込みのたびに `revalidateTag` で破棄する。
+- 読み取りはキャッシュせず毎回 DB から取得する（`unstable_cache` は破棄直後に古い値を返し、Vercel では残高が巻き戻って見えたため）。
