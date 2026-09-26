@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import EmojiPicker from "@/components/ui/EmojiPicker";
 import Field, { NumberInput, inputClass } from "@/components/ui/Field";
 import FormActions from "@/components/ui/FormActions";
+import IconPicker from "@/components/ui/IconPicker";
 import { api } from "@/lib/client";
-import { REWARD_EMOJIS } from "@/lib/constants";
+import { ICON_DEFAULTS } from "@/lib/constants";
 
 function initialForm(editing) {
-  if (!editing) return { name: "", emoji: "🎁", cost: "50", daily_limit: "", memo: "" };
+  if (!editing) {
+    return { name: "", emoji: ICON_DEFAULTS.reward.emoji, image_id: null, cost: "50", daily_limit: "", memo: "" };
+  }
   return {
     name: editing.name,
     emoji: editing.emoji,
+    image_id: editing.image_id,
     cost: String(editing.cost),
     daily_limit: editing.daily_limit ? String(editing.daily_limit) : "",
     memo: editing.memo,
@@ -62,7 +65,12 @@ export default function RewardForm({ editing, onSaved, onCancel }) {
 
       <div>
         <span className="mb-1.5 block text-xs font-semibold text-gray-500">アイコン</span>
-        <EmojiPicker value={form.emoji} onChange={set("emoji")} presets={REWARD_EMOJIS} />
+        <IconPicker
+          value={{ emoji: form.emoji, image_id: form.image_id }}
+          onChange={(icon) => setForm((f) => ({ ...f, ...icon }))}
+          defaultCategory={ICON_DEFAULTS.reward.category}
+          tone="reward"
+        />
       </div>
 
       <Field label="1日の上限回数（任意）" hint="空欄なら何回でも使えます">

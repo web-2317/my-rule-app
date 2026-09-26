@@ -47,7 +47,7 @@ function NavLink({ href, icon, label }) {
   const active = pathname === href;
 
   return (
-    <Link href={href} className="flex flex-1 flex-col items-center gap-0.5 py-1.5">
+    <Link href={href} scroll={false} className="flex flex-1 flex-col items-center gap-0.5 py-1.5">
       <span
         className={`flex h-8 w-8 items-center justify-center rounded-full ${
           active ? "bg-emerald-50" : ""

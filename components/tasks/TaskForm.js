@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import EmojiPicker from "@/components/ui/EmojiPicker";
 import Field, { NumberInput, inputClass } from "@/components/ui/Field";
 import FormActions from "@/components/ui/FormActions";
+import IconPicker from "@/components/ui/IconPicker";
 import Segmented from "@/components/ui/Segmented";
 import ProgressionPreview from "./ProgressionPreview";
 import { api } from "@/lib/client";
-import { PENALTY_EMOJIS, TASK_EMOJIS } from "@/lib/constants";
+import { ICON_DEFAULTS } from "@/lib/constants";
 import { PROGRESSIONS } from "@/lib/points";
 
 // 加算方式を切り替えたときの初期値
@@ -17,7 +17,8 @@ function initialForm(editing) {
   if (!editing) {
     return {
       name: "",
-      emoji: "✅",
+      emoji: ICON_DEFAULTS.task.emoji,
+      image_id: null,
       points: "10",
       is_penalty: false,
       progression: "none",
@@ -29,6 +30,7 @@ function initialForm(editing) {
   return {
     name: editing.name,
     emoji: editing.emoji,
+    image_id: editing.image_id,
     points: String(editing.points),
     is_penalty: editing.is_penalty,
     progression: editing.progression,
@@ -53,12 +55,10 @@ export default function TaskForm({ editing, onSaved, onCancel }) {
     setForm((f) => ({
       ...f,
       is_penalty: toPenalty,
-      // プリセットのアイコンのままなら、種類に合わせたアイコンに差し替える
+      // 初期アイコンのままなら、種類に合わせた初期アイコンに差し替える
       emoji:
-        f.emoji === (toPenalty ? TASK_EMOJIS[0] : PENALTY_EMOJIS[0])
-          ? toPenalty
-            ? PENALTY_EMOJIS[0]
-            : TASK_EMOJIS[0]
+        !f.image_id && f.emoji === ICON_DEFAULTS[toPenalty ? "task" : "penalty"].emoji
+          ? ICON_DEFAULTS[toPenalty ? "penalty" : "task"].emoji
           : f.emoji,
     }));
   };
@@ -124,10 +124,11 @@ export default function TaskForm({ editing, onSaved, onCancel }) {
 
       <div>
         <span className="mb-1.5 block text-xs font-semibold text-gray-500">アイコン</span>
-        <EmojiPicker
-          value={form.emoji}
-          onChange={set("emoji")}
-          presets={penalty ? PENALTY_EMOJIS : TASK_EMOJIS}
+        <IconPicker
+          value={{ emoji: form.emoji, image_id: form.image_id }}
+          onChange={(icon) => setForm((f) => ({ ...f, ...icon }))}
+          defaultCategory={ICON_DEFAULTS[penalty ? "penalty" : "task"].category}
+          tone={penalty ? "danger" : "accent"}
         />
       </div>
 

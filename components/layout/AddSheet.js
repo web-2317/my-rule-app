@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Modal from "@/components/ui/Modal";
+import { iconText } from "@/components/ui/ItemIcon";
 import Segmented from "@/components/ui/Segmented";
 import TaskForm from "@/components/tasks/TaskForm";
 import RewardForm from "@/components/rewards/RewardForm";
@@ -18,7 +19,7 @@ export default function AddSheet({ onClose }) {
   const handleSaved = (item) => {
     onClose();
     notifyDataChanged();
-    toast({ message: `${item.emoji} ${item.name} を追加しました`, duration: 2500 });
+    toast({ message: `${iconText(item)}${item.name} を追加しました`, duration: 2500 });
   };
 
   return (

@@ -7,7 +7,7 @@ function formatPoints(n) {
 }
 
 // 全ページ共通の上部バー。所持ポイントが変わると一瞬強調する
-export default function PointHeader({ summary }) {
+export default function PointHeader({ summary, scrolled }) {
   const { balance, today } = summary;
   const [flash, setFlash] = useState(null);
   const prev = useRef(balance);
@@ -21,7 +21,11 @@ export default function PointHeader({ summary }) {
   }, [balance]);
 
   return (
-    <header className="sticky top-0 z-30 bg-page/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur sm:px-6">
+    <header
+      className={`bg-page px-4 pt-[env(safe-area-inset-top)] transition-shadow sm:px-6 ${
+        scrolled ? "shadow-[0_1px_0_rgba(15,23,42,0.08)]" : ""
+      }`}
+    >
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 py-3">
         <div className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-bold text-white shadow-sm">

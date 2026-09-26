@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CardFooter from "@/components/ui/CardFooter";
+import ItemIcon from "@/components/ui/ItemIcon";
 import Stepper from "@/components/ui/Stepper";
 import { MAX_COUNT_PER_ACTION, describeProgression, pointsForRange } from "@/lib/points";
 
@@ -35,11 +36,11 @@ export default function TaskCard({ task, onComplete, onEdit, onDelete }) {
     <article className="relative rounded-3xl bg-white p-4 shadow-card">
       <div className="flex items-start gap-3">
         <div
-          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl ${
+          className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-2xl ${
             penalty ? "bg-rose-50" : "bg-emerald-50"
           }`}
         >
-          {task.emoji}
+          <ItemIcon emoji={task.emoji} imageId={task.image_id} />
         </div>
 
         <div className="min-w-0 flex-1 pt-0.5">

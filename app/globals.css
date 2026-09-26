@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  /* 固定ヘッダーの下に内容が潜り込まないよう、スクロール位置の基準をヘッダーの高さ分ずらす */
+  html {
+    scroll-padding-top: var(--header-h, 0px);
+  }
+
   body {
     @apply bg-page text-gray-800 antialiased;
   }

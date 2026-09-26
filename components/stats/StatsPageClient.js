@@ -7,6 +7,7 @@ import RankingCard from "./RankingCard";
 import SummaryTiles from "./SummaryTiles";
 import { GAIN_COLOR, LOSS_COLOR } from "./PointsChart";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { iconText } from "@/components/ui/ItemIcon";
 import PageTitle from "@/components/ui/PageTitle";
 import { useToast } from "@/components/ui/Toast";
 import { api } from "@/lib/client";
@@ -57,7 +58,7 @@ export default function StatsPageClient({ initialStats, initialHistory }) {
   };
 
   return (
-    <main className="mx-auto max-w-3xl space-y-4 px-4 pb-8 pt-4 sm:px-6">
+    <main className="mx-auto max-w-3xl space-y-4 px-4 pb-8 pt-6 sm:px-6">
       <PageTitle title="データ" subtitle="積み重ねを振り返ろう" />
 
       <SummaryTiles stats={stats} gainColor={GAIN_COLOR} lossColor={LOSS_COLOR} />
@@ -80,7 +81,7 @@ export default function StatsPageClient({ initialStats, initialHistory }) {
           onConfirm={handleUndo}
           onCancel={() => setUndoing(null)}
         >
-          「{undoing.emoji} {undoing.name}
+          「{iconText(undoing)}{undoing.name}
           {undoing.count > 1 ? ` ×${undoing.count}` : ""}」（
           {undoing.points >= 0 ? `+${undoing.points}` : `−${-undoing.points}`}pt）を取り消しますか？
           <p className="mt-1 text-xs text-gray-400">

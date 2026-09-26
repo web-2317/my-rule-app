@@ -52,3 +52,16 @@ CREATE TABLE IF NOT EXISTS point_logs (
 CREATE INDEX IF NOT EXISTS idx_point_logs_local_date ON point_logs (local_date);
 CREATE INDEX IF NOT EXISTS idx_point_logs_task_date ON point_logs (task_id, local_date);
 CREATE INDEX IF NOT EXISTS idx_point_logs_reward_date ON point_logs (reward_id, local_date);
+
+-- ---- アイコン画像（2026-09 追加）----
+-- アップロード画像はブラウザで 128px の正方形に縮小した data URL で保存し、/api/icons/:id で配信する
+CREATE TABLE IF NOT EXISTS icon_images (
+  id SERIAL PRIMARY KEY,
+  data TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS image_id INTEGER REFERENCES icon_images (id) ON DELETE SET NULL;
+ALTER TABLE rewards ADD COLUMN IF NOT EXISTS image_id INTEGER REFERENCES icon_images (id) ON DELETE SET NULL;
+-- 履歴にも記録時点のアイコンを残す
+ALTER TABLE point_logs ADD COLUMN IF NOT EXISTS image_id INTEGER REFERENCES icon_images (id) ON DELETE SET NULL;

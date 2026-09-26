@@ -5,6 +5,7 @@ import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import EmptyState from "@/components/ui/EmptyState";
+import { iconText } from "@/components/ui/ItemIcon";
 import ListToolbar, { ToolbarButton } from "@/components/ui/ListToolbar";
 import Modal from "@/components/ui/Modal";
 import PageTitle from "@/components/ui/PageTitle";
@@ -48,8 +49,8 @@ export default function TaskListPage({ initialTasks }) {
       const amount = Math.abs(log.points);
       const times = count > 1 ? ` ×${count}` : "";
       let message = task.is_penalty
-        ? `${task.emoji} ${task.name}${times}  −${amount}pt`
-        : `${task.emoji} ${task.name}${times}  +${amount}pt`;
+        ? `${iconText(task)}${task.name}${times}  −${amount}pt`
+        : `${iconText(task)}${task.name}${times}  +${amount}pt`;
       if (log.requested > amount) {
         message += `（残高不足のため ${amount}pt で止めました）`;
       }
@@ -98,7 +99,7 @@ export default function TaskListPage({ initialTasks }) {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-8 pt-4 sm:px-6">
+    <main className="mx-auto max-w-3xl px-4 pb-8 pt-6 sm:px-6">
       <PageTitle title="タスク" subtitle="達成してポイントを貯めよう" />
 
       {tasks.length === 0 ? (
@@ -144,7 +145,7 @@ export default function TaskListPage({ initialTasks }) {
           onConfirm={handleDelete}
           onCancel={() => setDeleting(null)}
         >
-          「{deleting.emoji} {deleting.name}」を削除しますか？
+          「{iconText(deleting)}{deleting.name}」を削除しますか？
           <p className="mt-1 text-xs text-gray-400">これまでの履歴・統計は残ります。</p>
         </ConfirmDialog>
       )}

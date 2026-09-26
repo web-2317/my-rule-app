@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Stepper from "@/components/ui/Stepper";
 import CardFooter from "@/components/ui/CardFooter";
+import ItemIcon from "@/components/ui/ItemIcon";
 import { MAX_COUNT_PER_ACTION } from "@/lib/points";
 
 export default function RewardCard({ reward, balance, onRedeem, onEdit, onDelete }) {
@@ -26,8 +27,8 @@ export default function RewardCard({ reward, balance, onRedeem, onEdit, onDelete
   return (
     <article className="rounded-3xl bg-white p-4 shadow-card">
       <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl">
-          {reward.emoji}
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-amber-50 text-2xl">
+          <ItemIcon emoji={reward.emoji} imageId={reward.image_id} />
         </div>
 
         <div className="min-w-0 flex-1 pt-0.5">

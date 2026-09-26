@@ -5,6 +5,7 @@ import RewardCard from "./RewardCard";
 import RewardForm from "./RewardForm";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import EmptyState from "@/components/ui/EmptyState";
+import ItemIcon, { iconText } from "@/components/ui/ItemIcon";
 import ListToolbar, { ToolbarButton } from "@/components/ui/ListToolbar";
 import Modal from "@/components/ui/Modal";
 import PageTitle from "@/components/ui/PageTitle";
@@ -50,7 +51,7 @@ export default function RewardListPage({ initialRewards }) {
       notifyDataChanged();
       const times = count > 1 ? ` ×${count}` : "";
       toast({
-        message: `${reward.emoji} ${reward.name}${times}  −${-log.points}pt　楽しんで！`,
+        message: `${iconText(reward)}${reward.name}${times}  −${-log.points}pt　楽しんで！`,
         action: { label: "元に戻す", onClick: () => undo(log.id) },
       });
     } catch (e) {
@@ -85,7 +86,7 @@ export default function RewardListPage({ initialRewards }) {
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-8 pt-4 sm:px-6">
+    <main className="mx-auto max-w-3xl px-4 pb-8 pt-6 sm:px-6">
       <PageTitle title="ご褒美" subtitle="貯めたポイントで自分にご褒美を" />
 
       {rewards.length === 0 ? (
@@ -123,7 +124,9 @@ export default function RewardListPage({ initialRewards }) {
           onCancel={() => setConfirming(null)}
         >
           <div className="rounded-2xl bg-gray-50 p-4 text-center">
-            <p className="text-4xl">{confirming.reward.emoji}</p>
+            <div className="mx-auto flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-amber-50 text-4xl">
+              <ItemIcon emoji={confirming.reward.emoji} imageId={confirming.reward.image_id} />
+            </div>
             <p className="mt-2 font-bold text-gray-900">
               {confirming.reward.name}
               {confirming.count > 1 && ` ×${confirming.count}`}
@@ -147,7 +150,7 @@ export default function RewardListPage({ initialRewards }) {
           onConfirm={handleDelete}
           onCancel={() => setDeleting(null)}
         >
-          「{deleting.emoji} {deleting.name}」を削除しますか？
+          「{iconText(deleting)}{deleting.name}」を削除しますか？
           <p className="mt-1 text-xs text-gray-400">これまでの履歴・統計は残ります。</p>
         </ConfirmDialog>
       )}

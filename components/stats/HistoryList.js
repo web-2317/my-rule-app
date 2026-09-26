@@ -1,5 +1,6 @@
 "use client";
 
+import ItemIcon from "@/components/ui/ItemIcon";
 import { formatDateShort, formatTime } from "@/lib/dates";
 
 const KIND_LABEL = { task: "タスク", penalty: "ペナルティ", reward: "ご褒美" };
@@ -26,13 +27,15 @@ export default function HistoryList({ logs, hasMore, loadingMore, onLoadMore, on
         <div className="space-y-4">
           {groupByDate(logs).map((g) => (
             <div key={g.date}>
-              <p className="sticky top-[4.5rem] bg-white py-1.5 text-[11px] font-semibold text-gray-400">
+              <p className="sticky top-[var(--header-h,4.5rem)] bg-white py-1.5 text-[11px] font-semibold text-gray-400">
                 {formatDateShort(g.date)}
               </p>
               <ul className="divide-y divide-gray-50">
                 {g.logs.map((log) => (
                   <li key={log.id} className="flex items-center gap-3 py-2.5">
-                    <span className="text-xl">{log.emoji}</span>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg text-xl">
+                      <ItemIcon emoji={log.emoji} imageId={log.image_id} />
+                    </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm text-gray-800">
                         {log.name}
