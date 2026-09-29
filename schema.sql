@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS point_logs (
   count INTEGER NOT NULL CHECK (count > 0),              -- まとめて達成した回数
   seq_from INTEGER NOT NULL DEFAULT 1,                   -- その日の何回目から始まったか
   points INTEGER NOT NULL,                               -- 符号付き（獲得 +, 消費・減点 -）
-  local_date DATE NOT NULL,                              -- JST 基準の日付
+  local_date DATE NOT NULL,                              -- JST・深夜4時区切りの日付
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
